@@ -2,6 +2,8 @@ package usuarios.usuarios.Servicios;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import usuarios.usuarios.DTO.UsuarioDTO;
+import usuarios.usuarios.DTO.UsuarioNombrePassDTO;
 import usuarios.usuarios.DTO.UsuarioSinIdDTO;
 import usuarios.usuarios.Entidades.Usuario;
 import usuarios.usuarios.Repositorios.UsuarioRepo;
@@ -12,14 +14,60 @@ public class UsuarioServicio {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
-    public void crearUsuario(UsuarioSinIdDTO usuarioSinIdDTO) {
+    public void crearUsuario(UsuarioSinIdDTO dto) {
         Usuario usuario = new Usuario();
-        usuario.setNombre(usuarioSinIdDTO.getNombre());
-        usuario.setCorreo(usuarioSinIdDTO.getCorreo_electronico());
-        usuario.setDireccion(usuarioSinIdDTO.getDireccion());
-        usuario.setContrasena(usuarioSinIdDTO.getContrasena());
+        usuario.setNombre(dto.getNombre());
+        usuario.setCorreo(dto.getCorreo_electronico());
+        usuario.setDireccion(dto.getDireccion());
+        usuario.setContrasena(dto.getContrasena());
 
         usuarioRepo.save(usuario);
     }
 
+    public boolean existeUsuario(int id) {
+        return usuarioRepo.existsById((long) id);
+    }
+
+    public void actualizarUsuario(UsuarioDTO dto) {
+        if (!existeUsuario(dto.getId())) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioRepo.findById((long) dto.getId()).get();
+
+        usuario.setNombre(dto.getNombre());
+        usuario.setCorreo(dto.getCorreo_electronico());
+        usuario.setDireccion(dto.getDireccion());
+        usuario.setContrasena(dto.getContrasena());
+
+        usuarioRepo.save(usuario);
+    }
+
+    public void eliminarUsuario(UsuarioNombrePassDTO dto) {
+        Usuario usuario = usuarioRepo
+                .findByNombreAndContrasena(
+                        dto.getNombre(),
+                        dto.getContrasena()
+                ).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuarioRepo.delete(usuario);
+    }
+
+    public boolean validarUsuario(UsuarioNombrePassDTO dto) {
+        return usuarioRepo
+                .findByNombreAndContrasena(dto.getNombre(), dto.getContrasena())
+                .isPresent();
+    }
+
+    public String obtenerInfoUsuarioPorId(Long id) {
+        Usuario usuario = usuarioRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        return usuario.getNombre();
+    }
+
+    public int obtenerInfoUsuarioPorNombre(String nombre) {
+        Usuario usuario = usuarioRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        return usuario.getUsuario_id();
+    }
 }
