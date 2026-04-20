@@ -24,12 +24,10 @@ public class UsuarioServicio {
         usuarioRepo.save(usuario);
     }
 
-    public boolean existeUsuario(int id) {
-        return usuarioRepo.existsById((long) id);
-    }
+
 
     public void actualizarUsuario(UsuarioDTO dto) {
-        if (!existeUsuario(dto.getId())) {
+        if (!checkIfExist(dto.getId())) {
             throw new RuntimeException("Usuario no encontrado");
         }
 
@@ -66,8 +64,12 @@ public class UsuarioServicio {
     }
 
     public int obtenerInfoUsuarioPorNombre(String nombre) {
-        Usuario usuario = usuarioRepo.findById(id)
+        Usuario usuario = usuarioRepo.findByNombre(nombre)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
         return usuario.getUsuario_id();
+    }
+
+    public boolean checkIfExist(int id) {
+        return usuarioRepo.existsById((long) id);
     }
 }

@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Tarea3-UD3_PSP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Tarea32-UD3_PSP" vcs="Git" />
   </component>
 </project>

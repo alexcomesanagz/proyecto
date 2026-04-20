@@ -69,11 +69,16 @@ public class UsuarioControlador {
     public ResponseEntity<String> obtenerInfoUsuarioPorNombre(@PathVariable String nombre) {
         try {
             int id = usuarioServicio.obtenerInfoUsuarioPorNombre(nombre);
-            return ResponseEntity.ok(id);
+            return ResponseEntity.ok(Integer.toString(id));
         } catch (Exception e) {
             return ResponseEntity.ok().body("No se ha podido encontrar el usuario con el nombre dado.");
         }
     }
 
+    @GetMapping("/checkIfExist/{id}")
+    public ResponseEntity<Boolean> checkIfExist(@PathVariable int id) {
+        boolean exist = usuarioServicio.checkIfExist(id);
+        return ResponseEntity.ok(exist);
+    }
 
 }
