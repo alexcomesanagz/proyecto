@@ -1,17 +1,19 @@
 package reservas.reservas.Entidades;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import reservas.reservas.Enums.TipoHabitacion;
 
-@Data
-@RequiredArgsConstructor
-@NoArgsConstructor
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "habitacion")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = {"hotel", "reservas"})
 public class Habitacion {
 
     @Id
@@ -19,24 +21,33 @@ public class Habitacion {
     @Column(name = "habitacion_id")
     private int habitacion_id;
 
-    @NonNull
-    @Column(name= "hotel_id")
-    private int hotel_id;
-
-    @NonNull
     @Column(name= "numero_habitacion")
     private int numero_habitacion;
 
-    @NonNull
     @Enumerated(EnumType.STRING)
-    @Column(name= "tipo")
+    @Column(length = 50) //varchar(50)
     private TipoHabitacion tipo;
 
-    @NonNull
-    @Column(name= "precio")
-    private double precio;
-
-    @NonNull
-    @Column(name= "disponible")
+    @Column(precision = 10, scale = 2) //decimal(10,2)
+    private BigDecimal precio;
     private boolean disponible;
+
+    //muchas habitaciones a un hotel
+    @ManyToOne
+    @JoinColumn(name= "hotel_id")
+    private Hotel hotel;
+
+    //una habitación con muchas reservas
+    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
+
+    public void addReserva (Reserva r){
+        reservas.add(r);
+        r.setHabitacion(this);
+    }
+
+    public void removeReserva (Reserva r){
+        reservas.remove(r);
+        r.setHabitacion(null);
+    }
 }
