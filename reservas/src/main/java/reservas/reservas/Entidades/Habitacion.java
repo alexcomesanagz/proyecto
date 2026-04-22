@@ -13,6 +13,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+// Evita incluir los campos 'hotel' y 'reservas' en el toString()
+// para prevenir bucles infinitos debido a relaciones bidireccionales
+// entre entidades (Hotel ↔ Habitacion ↔ Reserva).
 @ToString(exclude = {"hotel", "reservas"})
 public class Habitacion {
 

@@ -24,8 +24,6 @@ public class UsuarioServicio {
         usuarioRepo.save(usuario);
     }
 
-
-
     public void actualizarUsuario(UsuarioDTO dto) {
         if (!checkIfExist(dto.getId())) {
             throw new RuntimeException("Usuario no encontrado");

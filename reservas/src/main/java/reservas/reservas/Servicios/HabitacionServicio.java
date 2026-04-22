@@ -6,16 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import reservas.reservas.DTO.HabitacionesDTO.crearHabitacionDTO;
 import reservas.reservas.Entidades.Habitacion;
+import reservas.reservas.Entidades.Hotel;
 import reservas.reservas.Repositorios.HabitacionRepo;
+import reservas.reservas.Repositorios.HotelRepo;
 import usuarios.usuarios.DTO.UsuarioNombrePassDTO;
-import usuarios.usuarios.Entidades.Usuario;
-import usuarios.usuarios.Repositorios.UsuarioRepo;
 
 @Service
 public class HabitacionServicio {
 
     @Autowired
     private HabitacionRepo habitacionRepo;
+    @Autowired
+    private HotelRepo hotelRepo;
 
     public boolean comprobarUsuario(String usuario, String contrasena){
         RestTemplate restTemplate = new RestTemplate();
@@ -27,7 +29,7 @@ public class HabitacionServicio {
     }
 
     public void crearHabitacion(crearHabitacionDTO dto) {
-        if(comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
             throw new RuntimeException("Usuario no válido");
         }
 
@@ -35,7 +37,13 @@ public class HabitacionServicio {
         habitacion.setNumero_habitacion(dto.getNumero_habitacion());
         habitacion.setTipo(dto.getTipo());
         habitacion.setPrecio(dto.getPrecio());
-        habitacion.setHotel_id(dto.getHotel_id());
+        habitacion.setDisponible(true); //ponemos por defecto que este disponible sin que nos pase nada el user
+
+        //buscar el hotel
+        Hotel hotel = hotelRepo.findById(dto.getHotel_id())
+                        .orElseThrow(() -> new RuntimeException("Hotel no encontrado"));
+        //asignar relación
+        habitacion.setHotel(hotel);
 
         habitacionRepo.save(habitacion);
     }

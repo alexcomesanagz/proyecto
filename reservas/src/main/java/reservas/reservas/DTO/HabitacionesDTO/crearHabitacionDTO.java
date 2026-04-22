@@ -5,14 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import reservas.reservas.Enums.TipoHabitacion;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class crearHabitacionDTO {
     private int numero_habitacion;
     private TipoHabitacion tipo;
-    private double precio;
-    private int hotel_id;
+    private BigDecimal precio;
+    private Long hotel_id;
     private String usuario;
     private String contrasena;
 }
