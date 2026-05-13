@@ -1,7 +1,6 @@
 package comentarios.comentarios.Servicios;
 
-import comentarios.comentarios.DTO.CrearComentarioDTO;
-import comentarios.comentarios.DTO.UsuarioDTO;
+import comentarios.comentarios.DTO.*;
 import comentarios.comentarios.Entidades.Comentarios;
 import comentarios.comentarios.Repositorios.ComentarioRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -124,5 +125,39 @@ public class ComentariosServicio {
         } catch (Exception e) {
             throw new RuntimeException("No se pudieron eliminar los comentarios de la base de datos.");
         }
+    }
+
+    public String eliminarComentarioDeUsuario(EliminarComentarioDTO dto) {
+        if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
+            throw new RuntimeException("Usuario o contraseña incorrectos.");
+        }
+
+        Optional<Comentarios> comentarioOpt  = comentarioRepo.findById(dto.getId_comentario());
+        if(comentarioOpt.isEmpty()){
+            throw new RuntimeException("El comentario con ID " + dto.getId_comentario() + " no existe.");
+        }
+
+        Comentarios comentario = comentarioOpt.get();
+        int userId = idUsuario(dto.getNombre());
+
+        //[Opcional] Verificar que el comentario pertenezca al usuario que lo borra
+        if(comentario.getUsuarioId() != userId){
+            throw new RuntimeException("No tienes permisos para eliminar este comentario");
+        }
+
+        comentarioRepo.delete(comentario);
+
+        return "El comentario se ha eliminado correctamente.";
+    }
+
+    public String listarComentariosHotel(NombreHotelUsuarioDTO dto) {
+        if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
+            throw new RuntimeException("Usuario o contraseña incorrectos.");
+        }
+
+        //Obtener la lista desde el repositorio (pasando el nombre del hotel que viene en el DTO)
+        List<ComentarioHotelDTO> listaComentarios = comentarioRepo.buscarComentariosPorNombreHotel(dto.getNombreHotel());
+
+        return listaComentarios;
     }
 }

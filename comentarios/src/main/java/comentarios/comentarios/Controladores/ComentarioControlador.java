@@ -1,13 +1,19 @@
 package comentarios.comentarios.Controladores;
 
+import comentarios.comentarios.DTO.ComentarioHotelDTO;
 import comentarios.comentarios.DTO.CrearComentarioDTO;
+import comentarios.comentarios.DTO.EliminarComentarioDTO;
+import comentarios.comentarios.DTO.NombreHotelUsuarioDTO;
 import comentarios.comentarios.Servicios.ComentariosServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 //@RequestMapping("/comentarios") no tiene ningún efecto en GraphQL.
@@ -59,7 +65,28 @@ public class ComentarioControlador {
             String resultado = comentariosServicio.eliminarComentarios();
             return ResponseEntity.ok().body(resultado);
         } catch (Exception e) {
-            return ResponseEntity.ok().body("No se han podido eliminar los usuarios. ERROR:" + e.getMessage());
+            return ResponseEntity.ok().body("No se han podido eliminar los comentarios. ERROR:" + e.getMessage());
+        }
+    }
+
+    @MutationMapping
+    public ResponseEntity<String> eliminarComentarioDeUsuario(@Argument EliminarComentarioDTO dto) {
+        try {
+            String resultado = comentariosServicio.eliminarComentarioDeUsuario(dto);
+            return ResponseEntity.ok().body(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.ok().body("No se han podido eliminar el usuario. ERROR:" + e.getMessage());
+        }
+    }
+
+    //como hago esto para devolverlo
+    @QueryMapping
+    public ResponseEntity<String> listarComentariosHotel(@Argument NombreHotelUsuarioDTO dto) {
+        try {
+           List<ComentarioHotelDTO> resultado = comentariosServicio.listarComentariosHotel(dto);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.ok().body("No.");
         }
     }
 }
