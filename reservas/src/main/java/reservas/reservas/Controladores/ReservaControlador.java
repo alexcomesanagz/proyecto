@@ -78,4 +78,14 @@ public class ReservaControlador {
             return ResponseEntity.ok().body("No se han podido encontrar las reservas asociadas a ese estado.");
         }
     }
+
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkReserva(
+            @RequestParam int idUsuario,
+            @RequestParam int idHotel,
+            @RequestParam int idReserva
+    ) {
+        boolean exist = reservaServicio.checkReserva(idUsuario, idHotel, idReserva);
+        return ResponseEntity.ok(exist);
+    }
 }

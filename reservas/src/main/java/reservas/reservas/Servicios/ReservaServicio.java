@@ -21,6 +21,7 @@ import usuarios.usuarios.DTO.UsuarioNombrePassDTO;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,10 +33,7 @@ public class ReservaServicio {
     @Autowired
     private HabitacionRepo habitacionRepo;
 
-//    @Autowired
-//    private UsuarioRepo usuarioRepo;
-
-    public boolean comprobarUsuario(String usuario, String contrasena){
+    public boolean comprobarUsuario(String usuario, String contrasena) {
         RestTemplate restTemplate = new RestTemplate();
         String urlServicio = "http://localhost:8502/usuarios/validar";
         UsuarioNombrePassDTO usuarioDTO = new UsuarioNombrePassDTO(usuario, contrasena);
@@ -44,7 +42,7 @@ public class ReservaServicio {
         return Boolean.TRUE.equals(response.getBody());
     }
 
-    public int idUsuario(String usuario){
+    public int idUsuario(String usuario) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String urlServicio = "http://localhost:8502/usuarios/info/nombre/" + usuario;
@@ -56,13 +54,13 @@ public class ReservaServicio {
 
             return Integer.parseInt(response.getBody());
 
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("No se pudo obtener el id del usuario");
         }
     }
 
     public void crearReserva(crearReservaDTO dto) {
-        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if (!comprobarUsuario(dto.getUsuario(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos");
         }
 
@@ -84,7 +82,7 @@ public class ReservaServicio {
     }
 
     public void cambiarEstado(cambiarEstadoReservaDTO dto) {
-        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if (!comprobarUsuario(dto.getUsuario(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos");
         }
 
@@ -123,5 +121,20 @@ public class ReservaServicio {
                 reserva.getFecha_fin().toString(),
                 reserva.getHabitacion().getHabitacion_id()
         )).collect(Collectors.toList());
+    }
+
+    public boolean checkReserva(int idUsuario, int idHotel, int idReserva) {
+        return reservasRepo.findById((long) idReserva)
+                .map(reserva -> {
+                    boolean usuarioCoincide = reserva.getUsuario() == idUsuario;
+
+                    //Navegar por la relación: Reserva -> Habitacion -> Hotel -> hotel_id
+                    boolean hotelCoincide = reserva.getHabitacion() != null
+                            && reserva.getHabitacion().getHotel() != null
+                            && reserva.getHabitacion().getHotel().getHotel_id() == idHotel;
+
+                    return usuarioCoincide && hotelCoincide;
+                })
+                .orElse(false); //devuelve false si el idReserva no existe
     }
 }
