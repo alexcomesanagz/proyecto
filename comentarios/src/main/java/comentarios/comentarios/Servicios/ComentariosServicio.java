@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -20,7 +22,7 @@ public class ComentariosServicio {
     @Autowired
     private ComentarioRepositorio comentarioRepo;
 
-    public boolean comprobarUsuario(String usuario, String contrasena){
+    public boolean comprobarUsuario(String usuario, String contrasena) {
         RestTemplate restTemplate = new RestTemplate();
         String urlServicio = "http://localhost:8502/usuarios/validar";
         UsuarioDTO usuarioDTO = new UsuarioDTO(usuario, contrasena);
@@ -29,7 +31,7 @@ public class ComentariosServicio {
         return Boolean.TRUE.equals(response.getBody());
     }
 
-    public int idUsuario(String usuario){
+    public int idUsuario(String usuario) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String urlServicio = "http://localhost:8502/usuarios/info/nombre/" + usuario;
@@ -41,12 +43,12 @@ public class ComentariosServicio {
 
             return Integer.parseInt(response.getBody());
 
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("No se pudo obtener el id del usuario");
         }
     }
 
-    public int idHotel(String nombreHotel){
+    public int idHotel(String nombreHotel) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String urlServicio = "http://localhost:8501/reservas/hotel/id/" + nombreHotel;
@@ -58,12 +60,12 @@ public class ComentariosServicio {
 
             return Integer.parseInt(response.getBody());
 
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("No se pudo obtener el id del hotel");
         }
     }
 
-    public boolean reservaExist(int idUsuario, int idHotel, int idReserva){
+    public boolean reservaExist(int idUsuario, int idHotel, int idReserva) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String urlServicio = String.format(
@@ -72,14 +74,14 @@ public class ComentariosServicio {
             );
             ResponseEntity<Boolean> response = restTemplate.getForEntity(urlServicio, Boolean.class);
             return Boolean.TRUE.equals(response.getBody());
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
 
     public CrearComentarioDTO crearComentario(CrearComentarioDTO dto) {
-        if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
+        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos");
         }
 
@@ -128,12 +130,12 @@ public class ComentariosServicio {
     }
 
     public String eliminarComentarioDeUsuario(EliminarComentarioDTO dto) {
-        if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
+        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos.");
         }
 
-        Optional<Comentarios> comentarioOpt  = comentarioRepo.findById(dto.getId_comentario());
-        if(comentarioOpt.isEmpty()){
+        Optional<Comentarios> comentarioOpt = comentarioRepo.findById(dto.getId_comentario());
+        if (comentarioOpt.isEmpty()) {
             throw new RuntimeException("El comentario con ID " + dto.getId_comentario() + " no existe.");
         }
 
@@ -141,7 +143,7 @@ public class ComentariosServicio {
         int userId = idUsuario(dto.getNombre());
 
         //[Opcional] Verificar que el comentario pertenezca al usuario que lo borra
-        if(comentario.getUsuarioId() != userId){
+        if (comentario.getUsuarioId() != userId) {
             throw new RuntimeException("No tienes permisos para eliminar este comentario");
         }
 
@@ -150,14 +152,42 @@ public class ComentariosServicio {
         return "El comentario se ha eliminado correctamente.";
     }
 
-    public String listarComentariosHotel(NombreHotelUsuarioDTO dto) {
+    public List<ComentarioHotelDTO> listarComentariosHotel(NombreHotelUsuarioDTO dto) {
+        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
+            throw new RuntimeException("Usuario o contraseña incorrectos.");
+        }
+
+        return null;
+    }
+
+    /*
+    public ResponseEntity<List<ComentarioHotelDTO>> listarComentariosUsuario(UsuarioDTO dto) {
         if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
             throw new RuntimeException("Usuario o contraseña incorrectos.");
         }
 
-        //Obtener la lista desde el repositorio (pasando el nombre del hotel que viene en el DTO)
-        List<ComentarioHotelDTO> listaComentarios = comentarioRepo.buscarComentariosPorNombreHotel(dto.getNombreHotel());
+        //conseguir la id reserva con solo la info de usuario
+        Optional<Comentarios> comentarioOpt = comentarioRepo.buscarComentarioPorReservaId(dto.get());
+        if (comentarioOpt.isEmpty()) {
+            return List.of();
+        }
 
-        return listaComentarios;
+        return Stream.of(comentarioOpt.get()).map(comentario -> new ComentarioHotelDTO(
+                comentario.get().getHotel().getNombre(), // hacer funcion para conseguir nombreHotel
+                comentario.getReservaId(),
+                comentario.getPuntuacion(),
+                comentario.getComentario()
+        )).collect(Collectors.toList());
     }
+    */
+    /*
+    public ResponseEntity<List<ComentarioHotelDTO>> mostrarComentarioUsuarioReserva(MostrarComentarioUsuarioReservaDTO dto) {
+
+    }
+    */
+    /*
+    public Float puntuacionMediaHotel(NombreHotelUsuarioDTO dto) {
+    }
+    */
+
 }

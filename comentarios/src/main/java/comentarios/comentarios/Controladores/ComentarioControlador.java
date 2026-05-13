@@ -1,9 +1,6 @@
 package comentarios.comentarios.Controladores;
 
-import comentarios.comentarios.DTO.ComentarioHotelDTO;
-import comentarios.comentarios.DTO.CrearComentarioDTO;
-import comentarios.comentarios.DTO.EliminarComentarioDTO;
-import comentarios.comentarios.DTO.NombreHotelUsuarioDTO;
+import comentarios.comentarios.DTO.*;
 import comentarios.comentarios.Servicios.ComentariosServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -16,77 +13,66 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-//@RequestMapping("/comentarios") no tiene ningún efecto en GraphQL.
-//GraphQL maneja todas las operaciones bajo una única ruta interna configurada por Spring (usualmente /graphql)
-
-//entonces q empleo?
-
-//chatgpt me dijo esto en properties
-/*
-# Cambia el endpoint por defecto de GraphQL de /graphql a /comentarios
-spring.graphql.path=/comentarios
-
-# Cambia también el endpoint de la interfaz gráfica de GraphiQL para que funcione en consonancia
-spring.graphql.graphiql.path=/graphiql
-spring.graphql.graphiql.enabled=true
- */
-@RequestMapping("/comentarios")
-
 public class ComentarioControlador {
 
-    private final ComentariosServicio comentariosServicio;
-
     @Autowired
-    public ComentarioControlador(ComentariosServicio comentariosServicio) {
-        this.comentariosServicio = comentariosServicio;
-    }
+    private ComentariosServicio comentariosServicio;
 
-    //GraphQL requiere que devuelvas directamente el tipo de dato definido en tu esquema .graphqls
 
-    //seguro q debo devolver eso?, me suena q dijeras q era con responseEntity
-
-    //Tipo de Objeto Retornado: Tu esquema GraphQL especifica que la mutación devuelve un TypeHotelReservaPuntuacionComentarioDTO.
-    //No puedes devolver un CrearComentarioDTO directamente si no tiene exactamente los mismos campos o si no coincide con lo mapeado
-
-    //aqui me lo vuelve a decir
     @MutationMapping
-    public ResponseEntity<CrearComentarioDTO> crearComentario(@Argument CrearComentarioDTO dto) {
+    public CrearComentarioDTO crearComentario(@Argument CrearComentarioDTO dto) {
         try {
             CrearComentarioDTO comentario = comentariosServicio.crearComentario(dto);
-            return ResponseEntity.ok().body(comentario);
+            return comentario;
         } catch (Exception e) {
-            return ResponseEntity.ok().body(null);
+            return null;
+        }
+    }
+
+   /* @MutationMapping
+    public String eliminarComentarios() {
+        try {
+            return comentariosServicio.eliminarComentarios();
+        } catch (Exception e) {
+            return "No se han podido eliminar los comentarios. ERROR:" + e.getMessage();
         }
     }
 
     @MutationMapping
-    public ResponseEntity<String> eliminarComentarios() {
+    public String eliminarComentarioDeUsuario(@Argument EliminarComentarioDTO dto) {
         try {
-            String resultado = comentariosServicio.eliminarComentarios();
-            return ResponseEntity.ok().body(resultado);
+            return comentariosServicio.eliminarComentarioDeUsuario(dto);
         } catch (Exception e) {
-            return ResponseEntity.ok().body("No se han podido eliminar los comentarios. ERROR:" + e.getMessage());
+            return "No se han podido eliminar el usuario. ERROR:" + e.getMessage();
         }
     }
 
-    @MutationMapping
-    public ResponseEntity<String> eliminarComentarioDeUsuario(@Argument EliminarComentarioDTO dto) {
-        try {
-            String resultado = comentariosServicio.eliminarComentarioDeUsuario(dto);
-            return ResponseEntity.ok().body(resultado);
-        } catch (Exception e) {
-            return ResponseEntity.ok().body("No se han podido eliminar el usuario. ERROR:" + e.getMessage());
-        }
-    }
+//    @QueryMapping
+//    public List<ComentarioHotelDTO> listarComentariosHotel(@Argument NombreHotelUsuarioDTO dto) {
+//           return comentariosServicio.listarComentariosHotel(dto);
+//    }
 
-    //como hago esto para devolverlo
+    /*
     @QueryMapping
-    public ResponseEntity<String> listarComentariosHotel(@Argument NombreHotelUsuarioDTO dto) {
+    public ResponseEntity<List<ComentarioHotelDTO>> listarComentariosUsuario(@Argument UsuarioDTO dto) {
         try {
-           List<ComentarioHotelDTO> resultado = comentariosServicio.listarComentariosHotel(dto);
-            return ResponseEntity.ok(resultado);
+            return comentariosServicio.listarComentariosUsuario(dto);
         } catch (Exception e) {
-            return ResponseEntity.ok().body("No.");
+            throw new RuntimeException("Error al mostrar el comentario de la reserva: " + e.getMessage());
         }
     }
+     */
+    /*
+    @QueryMapping
+    public ResponseEntity<List<ComentarioHotelDTO>> mostrarComentarioUsuarioReserva(@Argument MostrarComentarioUsuarioReservaDTO dto) {
+        return comentariosServicio.mostrarComentarioUsuarioReserva(dto);
+    }
+    */
+    /*
+    @QueryMapping
+    public Float puntuacionMediaHotel(@Argument NombreHotelUsuarioDTO dto) {
+        return comentariosServicio.puntuacionMediaHotel(dto);
+    }
+     */
+
 }
