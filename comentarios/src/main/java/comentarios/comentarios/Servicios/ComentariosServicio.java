@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 
+import static java.lang.String.format;
+
 @Service
 public class ComentariosServicio {
 
@@ -60,6 +62,20 @@ public class ComentariosServicio {
         }
     }
 
+    public boolean reservaExist(int idUsuario, int idHotel, int idReserva){
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String urlServicio = String.format(
+                    "http://localhost:8501/reservas/check?idUsuario=%d&idHotel=%d&idReserva=%d",
+                    idUsuario, idHotel, idReserva
+            );
+            ResponseEntity<Boolean> response = restTemplate.getForEntity(urlServicio, Boolean.class);
+            return Boolean.TRUE.equals(response.getBody());
+        }catch(Exception e){
+            return false;
+        }
+    }
+
 
     public CrearComentarioDTO crearComentario(CrearComentarioDTO dto) {
         if(!comprobarUsuario(dto.getNombre(), dto.getContrasena())){
@@ -69,11 +85,19 @@ public class ComentariosServicio {
         int idHotel = idHotel(dto.getNombreHotel());
         int idUsuario = idUsuario(dto.getNombre());
 
-        //Deberá comprobar frente al microservicio reservas (método checkReserva)
-        //si la combinación (idUsuario - idHotel - idReserva) existe antes de poder crear el comentario.
+        //Comprobar mediante checkReserva
+        //si la combinación (idUsuario - idHotel - idReserva) existe antes de crear el comentario.
+        boolean reservaValida = reservaExist(idUsuario, idHotel, dto.getId_reserva());
+        if (!reservaValida) {
+            throw new RuntimeException("La combinación de Usuario, Hotel y Reserva no es válida o no existe.");
+        }
 
         //Si el usuario ya hizo un comentario sobre esa combinación (idUsuario - idHotel - idReserva)
         //no se podrá realizar el comentario
+        boolean yaComento = comentarioRepo.existsByUsuarioIdAndHotelIdAndReservaId(idUsuario, idHotel, dto.getId_reserva());
+        if (yaComento) {
+            throw new RuntimeException("El usuario ya ha realizado un comentario para esta reserva.");
+        }
 
         Comentarios comentario = new Comentarios();
         comentario.setUsuarioId(idUsuario);
@@ -87,5 +111,18 @@ public class ComentariosServicio {
         comentarioRepo.save(comentario);
 
         return dto;
+    }
+
+    public String eliminarComentarios() {
+        try {
+            if (comentarioRepo.count() == 0) {
+                return "No hay comentarios para eliminar.";
+            }
+
+            comentarioRepo.deleteAll();
+            return "Todos los comentarios han sido eliminados correctamente.";
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudieron eliminar los comentarios de la base de datos.");
+        }
     }
 }
