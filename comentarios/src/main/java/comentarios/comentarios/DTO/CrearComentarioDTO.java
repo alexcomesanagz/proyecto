@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CrearComentarioDTO {
     private String nombreHotel;
-    private int id_reserva;
+    private int reserva_id;
     private double puntuacion;
     private String comentario;
     private String nombre;

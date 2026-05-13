@@ -36,12 +36,10 @@ public class ComentariosServicio {
             RestTemplate restTemplate = new RestTemplate();
             String urlServicio = "http://localhost:8502/usuarios/info/nombre/" + usuario;
 
-            ResponseEntity<String> response = restTemplate.getForEntity(urlServicio, String.class);
-            if (response.getBody() == null || response.getBody().contains("No se ha podido")) {
-                throw new RuntimeException("Usuario no encontrado en el sistema de usuarios");
-            }
+            Integer id = restTemplate.getForObject(urlServicio, Integer.class);
+            if (id == null ) throw new RuntimeException("Usuario no encontrado en el sistema de usuarios");
 
-            return Integer.parseInt(response.getBody());
+            return id;
 
         } catch (Exception e) {
             throw new RuntimeException("No se pudo obtener el id del usuario");
@@ -51,16 +49,16 @@ public class ComentariosServicio {
     public int idHotel(String nombreHotel) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            String urlServicio = "http://localhost:8501/reservas/hotel/id/" + nombreHotel;
+            // Usamos {} para que RestTemplate codifique los espacios del nombre automáticamente
+            String urlServicio = "http://localhost:8501/reservas/hotel/id/{nombre}";
 
-            ResponseEntity<String> response = restTemplate.getForEntity(urlServicio, String.class);
-            if (response.getBody() == null || response.getBody().contains("No se ha podido")) {
-                throw new RuntimeException("Hotel no encontrado en el sistema de reservas");
-            }
+           Integer id = restTemplate.getForObject(urlServicio, Integer.class, nombreHotel);
+            if (id == null) throw new RuntimeException("Hotel no encontrado en el sistema de reservas");
 
-            return Integer.parseInt(response.getBody());
+            return id;
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("No se pudo obtener el id del hotel");
         }
     }
@@ -90,14 +88,14 @@ public class ComentariosServicio {
 
         //Comprobar mediante checkReserva
         //si la combinación (idUsuario - idHotel - idReserva) existe antes de crear el comentario.
-        boolean reservaValida = reservaExist(idUsuario, idHotel, dto.getId_reserva());
+        boolean reservaValida = reservaExist(idUsuario, idHotel, dto.getReserva_id());
         if (!reservaValida) {
             throw new RuntimeException("La combinación de Usuario, Hotel y Reserva no es válida o no existe.");
         }
 
         //Si el usuario ya hizo un comentario sobre esa combinación (idUsuario - idHotel - idReserva)
         //no se podrá realizar el comentario
-        boolean yaComento = comentarioRepo.existsByUsuarioIdAndHotelIdAndReservaId(idUsuario, idHotel, dto.getId_reserva());
+        boolean yaComento = comentarioRepo.existsByUsuarioIdAndHotelIdAndReservaId(idUsuario, idHotel, dto.getReserva_id());
         if (yaComento) {
             throw new RuntimeException("El usuario ya ha realizado un comentario para esta reserva.");
         }
@@ -105,7 +103,7 @@ public class ComentariosServicio {
         Comentarios comentario = new Comentarios();
         comentario.setUsuarioId(idUsuario);
         comentario.setHotelId(idHotel);
-        comentario.setReservaId(dto.getId_reserva());
+        comentario.setReservaId(dto.getReserva_id());
         comentario.setPuntuacion(dto.getPuntuacion());
         comentario.setComentario(dto.getComentario());
         String fechaCreacion = Instant.now().toString();

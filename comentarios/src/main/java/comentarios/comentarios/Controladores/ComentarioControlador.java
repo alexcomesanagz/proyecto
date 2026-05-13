@@ -20,11 +20,12 @@ public class ComentarioControlador {
 
 
     @MutationMapping
-    public CrearComentarioDTO crearComentario(@Argument CrearComentarioDTO dto) {
+    public CrearComentarioDTO crearComentario(@Argument(name = "dto") CrearComentarioDTO dto) {
         try {
             CrearComentarioDTO comentario = comentariosServicio.crearComentario(dto);
             return comentario;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

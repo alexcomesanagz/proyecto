@@ -37,7 +37,7 @@ input EliminarComentarioDTO{
 
 input CrearComentarioDTO{
     nombreHotel : String
-    id_reserva : Int
+    reserva_id : Int
     puntuacion : Float
     comentario : String
     nombre : String
@@ -46,7 +46,7 @@ input CrearComentarioDTO{
 
 type TypeHotelReservaPuntuacionComentarioDTO{
     nombreHotel : String
-    id_reserva : Int
+    reserva_id : Int
     puntuacion : Float
     comentario : String
 }
