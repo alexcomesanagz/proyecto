@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MostrarComentarioUsuarioReservaDTO {
     private int id_reserva;
-    private String nombre;
+    private String usuario;
     private String contrasena;
 }

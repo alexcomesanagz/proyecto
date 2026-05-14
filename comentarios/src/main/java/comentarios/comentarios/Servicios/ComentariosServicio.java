@@ -11,8 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -23,12 +21,19 @@ public class ComentariosServicio {
     private ComentarioRepositorio comentarioRepo;
 
     public boolean comprobarUsuario(String usuario, String contrasena) {
-        RestTemplate restTemplate = new RestTemplate();
-        String urlServicio = "http://localhost:8502/usuarios/validar";
-        UsuarioDTO usuarioDTO = new UsuarioDTO(usuario, contrasena);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String urlServicio = "http://localhost:8502/usuarios/validar";
+            UsuarioDTO usuarioDTO = new UsuarioDTO(usuario, contrasena);
 
-        ResponseEntity<Boolean> response = restTemplate.postForEntity(urlServicio, usuarioDTO, Boolean.class);
-        return Boolean.TRUE.equals(response.getBody());
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(urlServicio, usuarioDTO, Boolean.class);
+
+            // Devuelve TRUE si el usuario es correcto
+            return Boolean.TRUE.equals(response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error de conexión con Usuarios: " + e.getMessage());
+            return false; // Si falla la comunicación, el usuario no es válido
+        }
     }
 
     public int idUsuario(String usuario) {
@@ -46,20 +51,40 @@ public class ComentariosServicio {
         }
     }
 
-    public int idHotel(String nombreHotel) {
+    public int idHotel(String nombreHotel, String usuario, String contrasena) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            // Usamos {} para que RestTemplate codifique los espacios del nombre automáticamente
             String urlServicio = "http://localhost:8501/reservas/hotel/id/{nombre}";
 
-           Integer id = restTemplate.getForObject(urlServicio, Integer.class, nombreHotel);
-            if (id == null) throw new RuntimeException("Hotel no encontrado en el sistema de reservas");
+            UsuarioDTO authBody = new UsuarioDTO();
+            authBody.setUsuario(usuario);
+            authBody.setContrasena(contrasena);
 
-            return id;
+            ResponseEntity<String> response = restTemplate.postForEntity(urlServicio, authBody, String.class, nombreHotel);
+            String body = response.getBody();
+
+            // LOG para depurar: esto te mostrará en la consola EXACTAMENTE qué responde Reservas
+            System.out.println("Respuesta de Reservas: " + body);
+
+            if (body == null || !body.contains("ID:")) {
+                throw new RuntimeException("Respuesta inesperada: " + body);
+            }
+
+            // Respuesta esperada: "ID: 1 | Nombre: Hotel A"
+            // Buscamos lo que hay entre "ID:" y el primer "|"
+            int inicio = body.indexOf("ID:") + 3;
+            int fin = body.indexOf("|");
+
+            if (inicio < 3 || fin == -1) {
+                throw new RuntimeException("Formato de respuesta del hotel inválido: " + body);
+            }
+
+            String idExtraido = body.substring(inicio, fin).trim();
+            return Integer.parseInt(idExtraido);
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("No se pudo obtener el id del hotel");
+            throw new RuntimeException("Error al obtener ID del hotel: " + e.getMessage());
         }
     }
 
@@ -79,12 +104,12 @@ public class ComentariosServicio {
 
 
     public CrearComentarioDTO crearComentario(CrearComentarioDTO dto) {
-        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
+        if (!comprobarUsuario(dto.getUsuario(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos");
         }
 
-        int idHotel = idHotel(dto.getNombreHotel());
-        int idUsuario = idUsuario(dto.getNombre());
+        int idHotel = idHotel(dto.getNombreHotel(), dto.getUsuario(), dto.getContrasena());
+        int idUsuario = idUsuario(dto.getUsuario());
 
         //Comprobar mediante checkReserva
         //si la combinación (idUsuario - idHotel - idReserva) existe antes de crear el comentario.
@@ -109,7 +134,9 @@ public class ComentariosServicio {
         String fechaCreacion = Instant.now().toString();
         comentario.setFechaCreacion(fechaCreacion);
 
-        comentarioRepo.save(comentario);
+        Comentarios resultado = comentarioRepo.save(comentario);
+        System.out.println("Documento guardado con ID: " + resultado.getId());
+        System.out.println("En la colección: " + comentario.getClass().getSimpleName());
 
         return dto;
     }
@@ -128,7 +155,7 @@ public class ComentariosServicio {
     }
 
     public String eliminarComentarioDeUsuario(EliminarComentarioDTO dto) {
-        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
+        if (comprobarUsuario(dto.getUsuario(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos.");
         }
 
@@ -138,7 +165,7 @@ public class ComentariosServicio {
         }
 
         Comentarios comentario = comentarioOpt.get();
-        int userId = idUsuario(dto.getNombre());
+        int userId = idUsuario(dto.getUsuario());
 
         //[Opcional] Verificar que el comentario pertenezca al usuario que lo borra
         if (comentario.getUsuarioId() != userId) {
@@ -151,7 +178,7 @@ public class ComentariosServicio {
     }
 
     public List<ComentarioHotelDTO> listarComentariosHotel(NombreHotelUsuarioDTO dto) {
-        if (!comprobarUsuario(dto.getNombre(), dto.getContrasena())) {
+        if (comprobarUsuario(dto.getUsuario(), dto.getContrasena())) {
             throw new RuntimeException("Usuario o contraseña incorrectos.");
         }
 

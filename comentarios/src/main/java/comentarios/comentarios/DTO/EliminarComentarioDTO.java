@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EliminarComentarioDTO {
     private String id_comentario;
-    private String nombre;
+    private String usuario;
     private String contrasena;
 }

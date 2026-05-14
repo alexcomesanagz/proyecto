@@ -12,6 +12,6 @@ public class CrearComentarioDTO {
     private int reserva_id;
     private double puntuacion;
     private String comentario;
-    private String nombre;
+    private String usuario;
     private String contrasena;
 }

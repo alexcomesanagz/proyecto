@@ -40,7 +40,7 @@ input CrearComentarioDTO{
     reserva_id : Int
     puntuacion : Float
     comentario : String
-    nombre : String
+    usuario : String
     contrasena: String
 }
 

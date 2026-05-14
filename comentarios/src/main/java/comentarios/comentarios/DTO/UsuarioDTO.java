@@ -1,5 +1,6 @@
 package comentarios.comentarios.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsuarioDTO {
-    private String nombre;
+    @JsonProperty("usuario")
+    private String usuario;
     private String contrasena;
 }

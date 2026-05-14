@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NombreHotelUsuarioDTO {
     private String nombreHotel;
-    private String nombre;
+    private String usuario;
     private String contrasena;
 }

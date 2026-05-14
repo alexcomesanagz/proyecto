@@ -53,7 +53,8 @@ public class HotelControlador {
     public ResponseEntity<String> obtenerIdApartirNombre(@RequestBody ReservasUsuarioNombrePassDTO usuario, @PathVariable String nombre) {
         try {
             int id = hotelServicio.obtenerIdApartirNombre(usuario, nombre);
-            return ResponseEntity.ok().body("ID: "+ id +" | Nombre: "+ nombre);
+            String respuesta = "ID: " + id + " | Nombre: " + nombre;
+            return ResponseEntity.ok().body(respuesta);
         } catch (Exception e) {
             return ResponseEntity.ok().body("No se ha podido encontrar el hotel con el nombre proporcionado. ERROR:"+ e);
         }
