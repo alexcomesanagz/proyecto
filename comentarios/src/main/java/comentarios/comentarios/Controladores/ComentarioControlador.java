@@ -30,7 +30,7 @@ public class ComentarioControlador {
         }
     }
 
-   /* @MutationMapping
+   @MutationMapping
     public String eliminarComentarios() {
         try {
             return comentariosServicio.eliminarComentarios();
@@ -48,32 +48,34 @@ public class ComentarioControlador {
         }
     }
 
-//    @QueryMapping
-//    public List<ComentarioHotelDTO> listarComentariosHotel(@Argument NombreHotelUsuarioDTO dto) {
-//           return comentariosServicio.listarComentariosHotel(dto);
-//    }
-
-    /*
     @QueryMapping
-    public ResponseEntity<List<ComentarioHotelDTO>> listarComentariosUsuario(@Argument UsuarioDTO dto) {
-        try {
-            return comentariosServicio.listarComentariosUsuario(dto);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al mostrar el comentario de la reserva: " + e.getMessage());
+    public List<ComentarioHotelDTO> listarComentariosHotel(@Argument NombreHotelUsuarioDTO dto) {
+        try{
+            return comentariosServicio.listarComentariosHotel(dto);
+        }catch (Exception e){
+            System.out.println("Error al listar comentarios: " + e.getMessage());
+            return List.of();
         }
     }
-     */
-    /*
+
     @QueryMapping
-    public ResponseEntity<List<ComentarioHotelDTO>> mostrarComentarioUsuarioReserva(@Argument MostrarComentarioUsuarioReservaDTO dto) {
+    public List<ComentarioHotelDTO> listarComentariosUsuario(@Argument UsuarioDTO dto) {
+        return comentariosServicio.listarComentariosUsuario(dto);
+    }
+
+    @QueryMapping
+    public List<ComentarioHotelDTO> mostrarComentarioUsuarioReserva(@Argument MostrarComentarioUsuarioReservaDTO dto) {
         return comentariosServicio.mostrarComentarioUsuarioReserva(dto);
     }
-    */
-    /*
+
     @QueryMapping
     public Float puntuacionMediaHotel(@Argument NombreHotelUsuarioDTO dto) {
         return comentariosServicio.puntuacionMediaHotel(dto);
     }
-     */
+
+    @QueryMapping
+    public Float puntuacionesMediasUsuario(@Argument UsuarioDTO dto) {
+        return comentariosServicio.puntuacionesMediasUsuario(dto);
+    }
 
 }

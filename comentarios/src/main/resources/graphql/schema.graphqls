@@ -14,24 +14,24 @@ type Query{
 
 input mostrarComentarioUsuarioReservaDTO{
     id_reserva : Int
-    nombre : String
+    usuario : String
     contrasena: String
 }
 
 input UsuarioDTO{
-    nombre : String
+    usuario : String
     contrasena: String
 }
 
 input NombreHotelUsuarioDTO{
     nombreHotel : String
-    nombre : String
+    usuario : String
     contrasena: String
 }
 
 input EliminarComentarioDTO{
     id_comentario : String
-    nombre : String
+    usuario : String
     contrasena: String
 }
 

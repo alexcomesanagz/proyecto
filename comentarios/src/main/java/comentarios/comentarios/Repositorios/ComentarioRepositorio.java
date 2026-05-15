@@ -2,6 +2,7 @@ package comentarios.comentarios.Repositorios;
 
 import comentarios.comentarios.DTO.ComentarioHotelDTO;
 import comentarios.comentarios.Entidades.Comentarios;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,8 +16,20 @@ public interface ComentarioRepositorio extends MongoRepository<Comentarios, Stri
     boolean existsByUsuarioIdAndHotelIdAndReservaId(int usuarioId, int hotelId, int reservaId);
 
     List<Comentarios> findByHotelId(int hotelId);
+    List<Comentarios> findByUsuarioId(int usuarioId);
+    List<Comentarios> findByReservaId(int reservaId);
 
-//    @Query("SELECT c FROM Comentarios c WHERE c.reserva.id = :reservaId")
-//    Optional<Comentarios> buscarComentarioPorReservaId(@Param("reservaId") int reservaId);
+    Optional<Comentarios> findByReservaIdAndUsuarioId(int reservaId, int usuarioId);
 
+    @Aggregation(pipeline = {
+            "{ '$match': { 'hotelId': ?0 } }",
+            "{ '$group': { '_id': null, 'media': { '$avg': '$puntuacion' } } }"
+    })
+    Double getMediaPuntuacionByHotelId(int hotelId);
+
+    @Aggregation(pipeline = {
+            "{ '$match': { 'usuarioId': ?0 } }",
+            "{ '$group': { '_id': null, 'media': { '$avg': '$puntuacion' } } }"
+    })
+    Double getMediaPuntuacionByUsuarioId(int usuarioId);
 }
