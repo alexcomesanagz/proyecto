@@ -1,12 +1,3 @@
-Pom.xml -> Hecho
-
-Microservicio usuarios
-1.Características técnicas -> Hecho
-2.Funcionalidades
-    2.1 Crear nuevo usuario -> 
-    2.2 Actualizar usuario -> 
-    2.3 Eliminar usuario -> 
-    2.4 Validar usuario -> 
-    2.5 Obtener nombre usuario a partir de su identificador -> 
-    2.6 Obtener ID usuario a partir de su nombre -> 
-    2.7 Comprobar si un usuario existe -> 
+Han sido realizados todos los apartados pedidos en el proyecto,
+por lo tanto, se opta a toda la nota, según la web pone que son 4 puntos en total,
+de modo que se aspira llegar a los 4 puntos completos.

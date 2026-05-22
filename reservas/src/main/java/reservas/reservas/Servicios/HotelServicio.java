@@ -24,7 +24,7 @@ public class HotelServicio {
             UsuarioNombrePassDTO usuarioDTO = new UsuarioNombrePassDTO(usuario, contrasena);
 
             ResponseEntity<Boolean> response = restTemplate.postForEntity(urlServicio, usuarioDTO, Boolean.class);
-            return !Boolean.TRUE.equals(response.getBody());
+            return Boolean.TRUE.equals(response.getBody());
         }catch (Exception e){
             System.err.println("Error de conexión con Usuarios: " + e.getMessage());
             return false; // Si falla la comunicación, el usuario no es válido
@@ -44,7 +44,7 @@ public class HotelServicio {
     }
 
     public void actualizarHotel(actualizarHotelDTO dto) {
-        if(comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
             throw new RuntimeException("Usuario no válido");
         }
 
@@ -58,7 +58,7 @@ public class HotelServicio {
     }
 
     public void eliminarHotel(ReservasUsuarioNombrePassDTO dto, Long id) {
-        if(comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
             throw new RuntimeException("Usuario no válido");
         }
 
@@ -69,7 +69,7 @@ public class HotelServicio {
     }
 
     public int obtenerIdApartirNombre(ReservasUsuarioNombrePassDTO dto, String nombre) {
-        if(comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
             throw new RuntimeException("Usuario no válido");
         }
 
@@ -80,7 +80,7 @@ public class HotelServicio {
     }
 
     public String obtenerNombreAPartirId(ReservasUsuarioNombrePassDTO dto, Long id) {
-        if(comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
+        if(!comprobarUsuario(dto.getUsuario(), dto.getContrasena())){
             throw new RuntimeException("Usuario no válido");
         }
 
