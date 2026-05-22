@@ -16,7 +16,7 @@ public class UsuarioServicio {
 
     public void crearUsuario(UsuarioSinIdDTO dto) {
         Usuario usuario = new Usuario();
-        usuario.setNombre(dto.getNombre());
+        usuario.setNombre(dto.getUsuario());
         usuario.setCorreo(dto.getCorreo_electronico());
         usuario.setDireccion(dto.getDireccion());
         usuario.setContrasena(dto.getContrasena());
@@ -31,7 +31,7 @@ public class UsuarioServicio {
 
         Usuario usuario = usuarioRepo.findById((long) dto.getId()).get();
 
-        usuario.setNombre(dto.getNombre());
+        usuario.setNombre(dto.getUsuario());
         usuario.setCorreo(dto.getCorreo_electronico());
         usuario.setDireccion(dto.getDireccion());
         usuario.setContrasena(dto.getContrasena());
@@ -42,7 +42,7 @@ public class UsuarioServicio {
     public void eliminarUsuario(UsuarioNombrePassDTO dto) {
         Usuario usuario = usuarioRepo
                 .findByNombreAndContrasena(
-                        dto.getNombre(),
+                        dto.getUsuario(),
                         dto.getContrasena()
                 ).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -51,7 +51,7 @@ public class UsuarioServicio {
 
     public boolean validarUsuario(UsuarioNombrePassDTO dto) {
         return usuarioRepo
-                .findByNombreAndContrasena(dto.getNombre(), dto.getContrasena())
+                .findByNombreAndContrasena(dto.getUsuario(), dto.getContrasena())
                 .isPresent();
     }
 

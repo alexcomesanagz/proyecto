@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UsuarioSinIdDTO {
 
-    private String nombre;
+    private String usuario;
     private String correo_electronico;
     private String direccion;
     private String contrasena;
